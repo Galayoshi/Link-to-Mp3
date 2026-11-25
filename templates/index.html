@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>YouTube → MP3</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: white;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    .container {
+        background: #222;
+        padding: 40px;
+        border-radius: 15px;
+        width: 500px;
+        text-align: center;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    p {
+        color: #aaa;
+    }
+
+    input {
+        width: 90%;
+        padding: 14px;
+        margin: 20px 0;
+        border-radius: 8px;
+        border: none;
+        font-size: 16px;
+    }
+
+    button {
+        padding: 14px 25px;
+        border: none;
+        border-radius: 8px;
+        background: #e62117;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #ff3b30;
+    }
+
+    #mensaje {
+        margin-top: 20px;
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+```
+<div class="container">
+
+    <h1>🎵 MP3RAT 🐀</h1>
+
+    <p>Pega un enlace de YouTube para descargar su audio.</p>
+
+    <input
+        type="text"
+        id="url"
+        placeholder="https://www.youtube.com/watch?v=..."
+    >
+
+    <br>
+
+    <button onclick="descargar()">
+        Descargar MP3
+    </button>
+
+    <div id="mensaje"></div>
+
+</div>
+
+<script>
+
+    async function descargar() {
+
+        const url = document
+            .getElementById("url")
+            .value
+            .trim();
+
+        const mensaje =
+            document.getElementById("mensaje");
+
+        if (!url) {
+            mensaje.innerText =
+                "❌ Pega un enlace primero.";
+            return;
+        }
+
+        mensaje.innerText =
+            "⏳ Descargando...";
+
+        try {
+
+            const respuesta = await fetch("/download", {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    url: url
+                })
+            });
+
+            const datos = await respuesta.json();
+
+            if (datos.success) {
+
+                mensaje.innerText =
+                    "✅ ¡Descarga terminada!";
+
+                const enlace =
+                    document.createElement("a");
+
+                enlace.href =
+                    "/files/" +
+                    encodeURIComponent(datos.filename);
+
+                enlace.download =
+                    datos.filename;
+
+                document.body.appendChild(enlace);
+
+                enlace.click();
+
+                enlace.remove();
+
+            } else {
+
+                mensaje.innerText =
+                    "❌ " + datos.error;
+
+            }
+
+        } catch (error) {
+
+            mensaje.innerText =
+                "❌ Error: " + error.message;
+
+        }
+    }
+
+</script>
+```
+
+</body>
+
+</html>
